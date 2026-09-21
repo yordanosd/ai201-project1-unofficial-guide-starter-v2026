@@ -142,38 +142,53 @@ August are busy."
 
 ## Sample Answer
 
-<!-- One complete question and answer, pasted as text, with the source line
-     visible. Milestone 4. -->
-
-**Question:**
-How many people in Brightwater river town? 
+**Question:** Is Brightwater busy in October?
 
 **Answer:**
 
+```text
+  (best distance 0.314, cutoff 0.6)
+
+Yes, Brightwater is at its busiest from late September through November as term starts.
+
+This information comes from `guide_brightwater.md` and `guide_seasons.md`.
+
+Sources retrieved: guide_brightwater.md, guide_regional_transport.md, guide_seasons.md
 ```
-(best distance 0.259, cutoff 0.6)
 
-Brightwater has a population of about 40,000 people, which roughly doubles during term time (guide_brightwater.md).
+The user asked by month; the document says "Late September through November
+the town is at its busiest." The answer maps one to the other and names both
+files it drew on — criterion 5's range case and criterion 2, on the first run.
 
-Sources retrieved: guide_brightwater.md, guide_regional_transport.md, guide_walking.md
+**My relevance cutoff:** 0.6 (the starter default, kept on purpose)
 
-1 model calls this session, 716 tokens (686 in, 30 out)
-```
-
-**My relevance cutoff:**
-
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
+I ran my five test questions and the five `OUT_OF_SCOPE` questions through
+`python app.py retrieve` and recorded the best distance for each. Two clean
+groups, no overlap: in-scope tops out at 0.374, out-of-scope starts at 0.798.
+The gap is over 0.4 wide and 0.6 sits in the middle of it with roughly 0.2 of
+margin either way, so I kept it. The closest out-of-scope question was
+"capital of Mongolia" (0.819) — a place question, as predicted in criterion 3
+— and it was still refused with room to spare. The right file came back at
+rank 1 for all five in-scope questions.
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| How many people in Brightwater river town? | yes | 0.259 |
+| Can I visit the mill in Givens Mill in December? | yes | 0.306 |
+| Is Brightwater busy in October? | yes | 0.314 |
+| How much does the city museum in Marchwood for entry? | yes | 0.349 |
+| Does Elder Ness have public transport? | yes | 0.374 |
+| What is the recommended dosage of ibuprofen for a headache? | no | 0.798 |
+| What is the capital of Mongolia? | no | 0.819 |
+| How do I write a for loop in Rust? | no | 0.850 |
+| How do I change the oil in a diesel engine? | no | 0.937 |
+| Who won the 1994 World Cup? | no | 1.002 |
+
+Before the chunker fix, "How many people in Brightwater" had a best distance
+of 0.452 with the wrong file (`guide_regional_transport.md`) at rank 1 and the
+answer "not enough information" — because the population sentence was never
+indexed. After keeping the intro paragraph as a chunk: 0.259, right file,
+right answer. See Chunking Strategy.
 
 ## How I Used AI
 
