@@ -21,7 +21,7 @@ If you get stuck for 30 minutes, `fallback_split` is the original. Switch back
 to it, write down what you saw, and move on. That's a real observation about
 your pipeline, not giving up.
 """
-
+import re
 from dataclasses import dataclass
 
 import config
@@ -92,12 +92,42 @@ def split_documents(documents: list[Document]) -> list[Chunk]:
     the right function. `app.py chunks` prints that string for you.
 
     Things worth thinking about before you write any code:
-      - Are your documents short posts or long guides?
-      - Is the useful information in one sentence, or spread over a paragraph?
+      - Are your documents short posts or long guides? Long guides with section header
+      - Is the useful information in one sentence, or spread over a paragraph? Useful info in section header content
       - Would splitting on paragraph breaks keep more thoughts intact than
-        splitting on a character count?
+        splitting on a character count? Spliting by section headers
+
+    Chunking Strategy:
+        One chunk per `##` section, no overlap.
+
+        city_guides is 14 markdown files, each a title line followed by short
+        `##` sections (84 total, 177–712 characters). A section is already one
+        complete thought, so splitting anywhere else only damages it.
+
+        The town name lives only in the title, so every chunk is prefixed with
+        "<filename> — <title>" (~40 chars) to keep its town after the split.
+        Expected chunk size: 150–750 characters (criteria.md #4).
     """
-    return fallback_split(documents)
+    chunks = []
+    for doc in documents:
+        text = doc.text
+        title = text.split("\n", 1)[0].lstrip("# ").strip()
+        header = f"{doc.source} — {title}"
+        sections = re.split(r"\n(?=## )", text)
+        for i, sec in enumerate(sections):
+            body = sec.strip()
+            if i == 0:
+                # Intro block: drop the "# Title" line (already in the header)
+                # but keep the paragraph under it — it holds facts like population.
+                body = body.split("\n", 1)[1].strip() if "\n" in body else ""
+                if not body:
+                    continue
+            chunks.append(Chunk(
+                source=doc.source, index=i,
+                text=f"{header}\n{body}",
+                produced_by="chunker.py::split_documents",
+            ))
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:
