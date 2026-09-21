@@ -163,13 +163,18 @@ files it drew on — criterion 5's range case and criterion 2, on the first run.
 **My relevance cutoff:** 0.6 (the starter default, kept on purpose)
 
 I ran my five test questions and the five `OUT_OF_SCOPE` questions through
-`python app.py retrieve` and recorded the best distance for each. Two clean
-groups, no overlap: in-scope tops out at 0.374, out-of-scope starts at 0.798.
-The gap is over 0.4 wide and 0.6 sits in the middle of it with roughly 0.2 of
-margin either way, so I kept it. The closest out-of-scope question was
-"capital of Mongolia" (0.819) — a place question, as predicted in criterion 3
-— and it was still refused with room to spare. The right file came back at
-rank 1 for all five in-scope questions.
+`python app.py retrieve` and recorded the best distance for each. In-scope
+questions ranged from 0.259 to 0.374; out-of-scope from 0.798 to 1.002. Two
+clear groups with no overlap. 0.6 isn't too low: the highest in-scope
+distance is 0.374, so no answerable question is refused. It isn't too high:
+the lowest out-of-scope distance is 0.798, so nothing gets made up. It sits
+closer to the out-of-scope group than the in-scope one, which leaves room for
+harder in-scope questions to still pass, at the cost that an out-of-scope
+question close to the topic (a real town the corpus doesn't cover, say) could
+slip through. I would need more data points to make a better determination,
+but with a gap this wide I think 0.6 is a fair result. If I moved it, I'd go
+lower (about 0.55) to guard against that near-topic case. Worth testing in
+the future. 
 
 | Question | In corpus? | Best distance |
 |---|---|---|
