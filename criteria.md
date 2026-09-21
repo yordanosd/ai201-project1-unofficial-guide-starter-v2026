@@ -23,6 +23,7 @@ For at least 4 of my 5 test questions, the retrieved chunks include one that
 contains the answer.
 
 **Why this target:**
+For city guides, the town name lives in the header, not in every paragraph, so a chunk cut by paragraph can lose its town reference. A question about a town whose fact sits in one of those paragraphs may retrieve the wrong town's chunk.
 <!-- e.g. "One of my questions is about a topic only two documents mention, so
      I expect that one to be hard." -->
 
@@ -33,6 +34,7 @@ contains the answer.
 Every answer the system produces names at least one source document.
 
 **Why this target:**
+Each chunk stores its source file name as metadata, so the source is always available when an answer is generated. The only way this fails is if the response step doesn't carry that metadata into the answer.
 <!-- Why all five and not four? What about your setup makes that achievable —
      or what would have to go wrong for it not to be? -->
 
@@ -50,48 +52,45 @@ in at least 4 of 5 tries.
      just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
 
 **Why this target:**
+The starter cutoff is 0.6, and config.py notes most corpora land between
+0.45 and 0.75. I'll measure the best distance for my five in-scope and five
+out-of-scope questions in Milestone 4 and expect a visible gap between the
+two groups. The out-of-scope questions (diesel engines, ibuprofen, Rust) are
+semantically far from a travel corpus, so I expect the gate to catch them.
+I'm allowing one miss because "What is the capital of Mongolia?" is still a
+place question and the closest of the five to city_guides.
+
 <!-- What did your distances look like when you set the cutoff in Milestone 4?
      Was there a clean gap, or did the two groups overlap? -->
 
 ---
 
-## 4. Something about your chunks
+## 4. Chunks carry their document header
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
-
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
-
-
+Every chunk begins with its source file name and the document's main title
+(e.g. "guide_walking.md — Walking in the region"), and every chunk is between
+150 and 750 characters including that header.
 
 **Why this target:**
-
-
-
+In city_guides the town name lives in the document title, not in every
+paragraph, so a chunk split at a subheader would otherwise lose its town.
+Prepending the header fixes that. The size bound comes from measuring the
+84 `##` sections: 177–712 characters, plus a ~40-character header. A chunk
+outside 150–750 means the split didn't land on a subheader boundary.
 ---
 
-## 5. Your choice
+## 5. A user's time reference maps to the document's season or date range
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
+For both test questions that ask about a specific time (December for
+Givens Mill, October for Brightwater), the answer states the season or date
+range the document gives, whether the document uses a month range
+("late September through November") or a season word ("winter") — 2 of 2.
 
 **Why this target:**
-
-
+The corpus expresses time as ranges or season words, while users ask by
+month. The model has to map one to the other in both directions, and that
+mapping is where I expect the answer to be wrong. With two questions
+there's no reason to accept less than both.
 
 ---
 
