@@ -22,6 +22,11 @@
 
 ## What This Does
 
+I selected the city_guides corpus: 14 travel guides to towns in a fictional
+region. You can ask about a specific town or any travel question, from when
+to go to accessibility. If the guides cover the topic you get a short answer
+that cites the guide it came from. If they don't, it says so.
+
 <!-- Three or four sentences. Which corpus you picked, and the kinds of
      questions your system answers. Write it for someone who has never seen
      this repo.
@@ -207,6 +212,21 @@ is measurable. Hypothesis for Unit 2: raise k to 6.
 
 ## How I Used AI
 
+**1.** I gave Claude my chunking design (split at `##` headers, prefix each
+chunk with filename and title, no overlap) and asked for the function. It
+came back dropping everything above the first `##` as "the title block,"
+which also dropped the intro paragraph where facts like Brightwater's
+population live. I only caught it because test question 1 returned "not
+enough information." I had it keep the intro paragraph as chunk 0.
+
+**2.** I wrote my five test questions and two criteria and asked Claude to
+rate them and say how a grader would test each from the sentence alone. My
+first questions ("where to go in winter," "best for accessibility") scored
+low because they were recommendations with no right answer; I rewrote them
+backwards from specific sentences in the docs. For criterion 4 it measured
+the 84 sections (177–712 chars) so my size bound came from the corpus
+instead of a guess. I wrote every criterion and reason myself.
+
 <!-- Two specific moments. For each: what you asked for, what came back, and
      what you changed about it.
 
@@ -215,10 +235,6 @@ is measurable. Hypothesis for Unit 2: raise k to 6.
      "I used AI to help me code" is not.
 
      Milestone 5. -->
-
-**1.**
-
-**2.**
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
