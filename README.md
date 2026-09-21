@@ -195,6 +195,16 @@ answer "not enough information" — because the population sentence was never
 indexed. After keeping the intro paragraph as a chunk: 0.259, right file,
 right answer. See Chunking Strategy.
 
+**Retrieval finding:** on "Does Elder Ness have public transport?" the chunk
+that holds the answer (`guide_elder_ness.md` › Getting there: "No public
+transport of any kind") is not in the top 5. That section leads with tide
+flooding, so its embedding is mostly about tides, and "Getting around" (on
+foot, car park) outranks it. The model still answered correctly from "on
+foot" and cited the file, but not from the sentence I filed as `expects`.
+I tested k=10 and the chunk came back with the right answer; then k=6, and
+it came back at rank 6. Kept k=5 for submission so the Unit 2 before/after
+is measurable. Hypothesis for Unit 2: raise k to 6.
+
 ## How I Used AI
 
 <!-- Two specific moments. For each: what you asked for, what came back, and
