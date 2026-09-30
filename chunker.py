@@ -114,6 +114,10 @@ def split_documents(documents: list[Document]) -> list[Chunk]:
         title = text.split("\n", 1)[0].lstrip("# ").strip()
         header = f"{doc.source} — {title}"
         sections = re.split(r"\n(?=## )", text)
+        index = 0   # runs across the whole document, not per section: one
+                    # section can now yield more than one chunk, and store.py
+                    # builds Chroma ids from source+index, so a repeated index
+                    # would collide and silently drop a chunk.
         for i, sec in enumerate(sections):
             body = sec.strip()
             if i == 0:
@@ -122,12 +126,96 @@ def split_documents(documents: list[Document]) -> list[Chunk]:
                 body = body.split("\n", 1)[1].strip() if "\n" in body else ""
                 if not body:
                     continue
-            chunks.append(Chunk(
-                source=doc.source, index=i,
-                text=f"{header}\n{body}",
-                produced_by="chunker.py::split_documents",
-            ))
+            for part in _fit(body, header):
+                chunks.append(Chunk(
+                    source=doc.source, index=index,
+                    text=f"{header}\n{part}",
+                    produced_by="chunker.py::split_documents",
+                ))
+                index += 1
     return chunks
+
+
+# The bound criteria.md section 4 sets. A section is still the unit I want —
+# _fit only intervenes when one is too long to fit inside it.
+MAX_CHARS = 750
+MIN_CHARS = 150
+
+
+def _fit(body: str, header: str) -> list[str]:
+    """
+    Cut one section's body into pieces that fit MAX_CHARS once the header is on.
+
+    Most sections come back unchanged — this only does work when a section is
+    over the bound. In city_guides exactly one is: guide_accessibility.md's
+    "Straightforward" section describes three towns in three `**Town**`
+    paragraphs, which is a list rather than a single thought, so a paragraph
+    break is the least damaging place to cut it.
+
+    Splitting has a cost the size bound doesn't show: the header is re-prefixed
+    onto every piece, so cutting one 784-character chunk in two adds a second
+    ~72-character header. That is the price of keeping the town name on both
+    halves, and it is worth paying — a chunk that has lost its town is worse
+    than a chunk that is slightly short.
+    """
+    budget = MAX_CHARS - len(header) - 1   # -1 for the newline after the header
+    if len(body) <= budget:
+        return [body]
+
+    paragraphs = [p.strip() for p in re.split(r"\n\s*\n", body) if p.strip()]
+    parts: list[str] = []
+    current: list[str] = []
+
+    for paragraph in paragraphs:
+        candidate = current + [paragraph]
+        if current and len("\n\n".join(candidate)) > budget:
+            parts.append("\n\n".join(current))
+            current = [paragraph]
+        else:
+            current = candidate
+    if current:
+        parts.append("\n\n".join(current))
+
+    # A single paragraph longer than the budget can't be fixed by paragraph
+    # breaks. Fall back to sentence ends, then to a hard cut, so the bound holds
+    # whatever the corpus contains.
+    fitted: list[str] = []
+    for part in parts:
+        fitted.extend(_split_long(part, budget) if len(part) > budget else [part])
+
+    # Don't leave a fragment under the floor when it can ride along with its
+    # neighbour instead.
+    merged: list[str] = []
+    for part in fitted:
+        if (
+            merged
+            and len(part) < MIN_CHARS - len(header) - 1
+            and len(merged[-1]) + len(part) + 2 <= budget
+        ):
+            merged[-1] = f"{merged[-1]}\n\n{part}"
+        else:
+            merged.append(part)
+    return merged
+
+
+def _split_long(text: str, budget: int) -> list[str]:
+    """One over-long paragraph, cut at sentence ends where possible."""
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    pieces: list[str] = []
+    current = ""
+    for sentence in sentences:
+        candidate = f"{current} {sentence}".strip() if current else sentence
+        if current and len(candidate) > budget:
+            pieces.append(current)
+            current = sentence
+        else:
+            current = candidate
+        while len(current) > budget:      # a single sentence over budget
+            pieces.append(current[:budget].rstrip())
+            current = current[budget:].lstrip()
+    if current:
+        pieces.append(current)
+    return pieces
 
 
 def describe(chunks: list[Chunk]) -> str:
