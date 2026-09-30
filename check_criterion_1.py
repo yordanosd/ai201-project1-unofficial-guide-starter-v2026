@@ -115,6 +115,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Measure criterion 1 and save the output.")
     parser.add_argument("--run", type=int, required=True,
                         help="which run column this is (1, 2, 3)")
+    parser.add_argument("--label", default="",
+                        help="name this measurement, e.g. before/after. Writes "
+                             "run1_after.txt instead of run1.txt, so an earlier "
+                             "measurement is never overwritten.")
     args = parser.parse_args()
 
     out = io.StringIO()
@@ -123,7 +127,15 @@ def main() -> None:
 
     directory = config.RESULTS_DIR / "criterion_1"
     directory.mkdir(parents=True, exist_ok=True)
-    path = directory / f"run{args.run}.txt"
+    suffix = f"_{args.label}" if args.label else ""
+    path = directory / f"run{args.run}{suffix}.txt"
+    if path.exists() and not args.label:
+        raise SystemExit(
+            f"{path.relative_to(config.ROOT)} already exists.\n"
+            f"Pass --label to write alongside it instead of over it — an "
+            f"earlier measurement is evidence and does not get overwritten.\n"
+            f"  python check_criterion_1.py --run {args.run} --label after"
+        )
     path.write_text(text, encoding="utf-8")
 
     print(text)
