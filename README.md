@@ -557,9 +557,102 @@ change earned it.
 
      Milestone 5. -->
 
+All five criteria are MET after the fix, so nothing is still missed. What is
+still weak is how thinly most of them were tested — five questions is a small
+number to conclude anything from, and four of the five below come down to
+that.
+
+**1. Retrieved chunks contain the answer — tested too narrowly.** Five
+questions, and I wrote all five myself knowing what my corpus contained. That
+biases them toward things I already knew were in there. A wider set, including
+questions written without looking at the documents first, would tell me
+something my current set can't. Ran out of time.
+
+**2. Every answer names a source — solid, but it checks the weaker claim.**
+The grounding instruction asks the model to name the file it used, and it does,
+in all 15 answers across both runs. The check only verifies that the answer
+names *one of* the five retrieved sources, though, not that it names the one
+the answer actually came from. With `top_k=5` an answer could cite a file it
+didn't use and still pass. Checking the stronger claim needs a way to tie a
+sentence back to the chunk that produced it, which I don't have.
+
+**3. The gate stops out-of-corpus questions — never tested near the boundary.**
+It refused 5 of 5, but the closest out-of-scope question sat at 0.798 against a
+0.6 cutoff. Nothing I asked landed anywhere near the line. That makes the
+result a test of obviously-unrelated questions, not a test of the gate. What
+would actually probe it is questions about the region that the guides happen
+not to cover — a town not in the corpus, or a topic like train timetables —
+which should land in the 0.5–0.7 band where the cutoff has to make a real
+decision. Ran out of time.
+
+**4. Chunks carry their document header — works here, breaks on a document
+shaped differently.** Every chunk in `city_guides` carries its header because
+every file starts with a `# Title` line. `chunker.py::split_documents` takes
+line 1 as the title and doesn't check that it is one, so a new guide added in a
+different shape degrades silently:
+
+- A file starting with prose instead of `# Title` puts that first sentence
+  into the header — and the intro block then drops line 1 as if it were a
+  title, so the sentence is lost from the chunk body entirely. Verified: a
+  document beginning "A headland village of 300." loses the population from
+  its text and keeps it only in a malformed header.
+- A file starting directly with `## Getting around` gives *every* chunk in
+  that file the header "— Getting around", so the town name is wrong
+  throughout.
+
+Neither raises an error, and criterion 4's check wouldn't catch either: both
+still "begin with the source filename". The fix is to detect a missing title
+and fall back to the filename, plus a check that the title isn't a `##`
+heading. I found this while writing up rather than while testing, so it is
+diagnosed but not fixed.
+
+**5. Time reference maps to season or date range — two questions is not
+enough.** Both passed all three runs, but they cover one direction each:
+December → "winter", October → "late September through November". The corpus
+expresses time both as season words and as month ranges, and I tested one
+example of each. A month that falls on a boundary — March for the Givens Mill
+mill, which the guide says runs "March to November" — is where I'd expect this
+to be shaky, and I didn't ask it.
+
+**The judge itself.** `RETRIEVAL_RUBRIC` was self-contradictory and I only
+caught it by reading the chunks behind one verdict. The systematic version of
+that check — labelling a sample by hand and measuring how often the judge
+agrees — is the thing that would have caught it in minutes rather than by
+luck. I didn't run it.
+
 ## What I'd Do Differently
 
 <!-- Knowing what you know now — which of your five criteria would you write
      differently, and why?
 
      Milestone 5. -->
+
+**Criterion 1, tightened.** It passed at exactly 4 of 5 before the rubric fix
+— no margin at all. As written it asks only that the answer appear somewhere
+in the top five, which says nothing about ranking. I'd write it as *the top
+three results contain the answer*, which is a claim about retrieval putting
+the right thing near the top rather than merely somewhere in the pile.
+
+**Criterion 4, split in two.** It bundles two independent properties — every
+chunk carries a header, and every chunk fits 150–750 characters. When it
+failed, the single MISSED hid that the header half passed 94/94 and only the
+size half broke. Two criteria would have said which.
+
+**Criterion 4's bound, measured from the right thing.** I set 150–750 by
+measuring 84 `##` sections at 177–712 characters and adding ~40 for the
+header. But the chunker doesn't emit sections, it emits chunks, and there were
+94 of them reaching 784. I measured the input to the thing I was bounding
+instead of its output. Measuring the chunker's own output would have shown the
+784 immediately — `chunker.py::describe` prints it, and `python app.py index`
+had been printing it on every rebuild the whole time.
+
+**Criterion 3, aimed at the boundary.** "Four of five out-of-corpus questions
+refused" is satisfied by five questions that are nowhere near the cutoff, which
+is what happened. I'd write it against questions that sit close to the line,
+because that is the only place the threshold is doing work.
+
+**And I'd build the judge's calibration step first.** I wrote an LLM judge and
+trusted its numbers, and one of them was wrong. Labelling a handful of answers
+by hand and checking the judge against them costs very little and is the only
+thing that tells you whether the numbers mean anything. I treated it as
+optional and it should have come before the first run.
