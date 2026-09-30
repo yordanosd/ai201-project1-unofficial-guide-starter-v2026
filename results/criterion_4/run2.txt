@@ -1,0 +1,50 @@
+# Criterion 4 — chunks carry their document header
+
+- Produced by: `chunker.py::split_documents`
+- Measured by: `check_criterion_4.py::report`
+- Summary line from: `chunker.py::describe`
+- Corpus: `city_guides` (14 documents)
+- Bound from criteria.md section 4: 150-750 characters
+- When: 2026-09-29 18:58:41
+
+Costs no model calls — chunking runs locally.
+
+94 chunks, 341 characters on average (shortest 196, longest 784), produced by chunker.py::split_documents
+
+## The two checks
+
+| Check | Result |
+|---|---|
+| (a) text begins with its source filename | 94/94 |
+| (b) 150 <= length <= 750 | 93/94 |
+
+Size distribution: shortest 196, median 325, longest 784.
+Five largest: [572, 592, 627, 680, 784]
+
+## Chunks outside the bound
+
+- `guide_accessibility.md#1` — 784 characters, 34 over the ceiling
+
+Full text of the first one:
+
+```
+guide_accessibility.md — Getting around the region with limited mobility
+## Straightforward
+
+**Thornby Wells** is the easiest town in the region. It is flat, compact, and
+everything is within three minutes of everything else. Parking is free for two
+hours anywhere in town and the station is central. The pump room and gardens
+are level throughout.
+
+**Marchwood** has a modern tram network with level boarding on all four lines,
+running every 8 minutes on weekdays. The city museum and covered market are both
+step-free. The distances between districts are the main consideration.
+
+**Brightwater** is level along the river and through the centre. The mill museum
+is step-free. The station is a 15-minute walk from campus on flat ground, or the
+shuttle meets the four busiest arrivals.
+```
+
+## Verdict
+
+MISSED — 0 chunk(s) without a header, 1 outside 150-750. Target was every chunk, so any failure is a miss.

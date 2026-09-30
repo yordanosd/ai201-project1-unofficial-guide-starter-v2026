@@ -1,0 +1,5 @@
+{"when": "2026-09-29T18:47:07", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T18:47:07", "dimension": "retrieval", "subject": "no public transport", "verdict": false, "raw": "NO"}
+{"when": "2026-09-29T18:47:08", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T18:47:08", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T18:47:09", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
