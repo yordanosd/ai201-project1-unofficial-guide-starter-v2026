@@ -415,6 +415,61 @@ Source: `guide_brightwater.md` and `guide_seasons.md`
 
      Milestone 3. -->
 
+### Criterion 4 — stage: chunking
+
+`guide_accessibility.md#1` came out at 784 characters, 34 over the 750
+ceiling. Every other chunk fits, and all 94 carry their header, so the header
+half of the criterion was never in question — this is a size failure alone.
+
+The mechanism is in `chunker.py::split_documents`. My strategy is one chunk
+per `##` section with no size cap, chosen because a section is usually one
+complete thought and cutting inside it does more harm than good. That holds
+for almost every section in the corpus. It doesn't hold for
+`guide_accessibility.md`'s "Straightforward" section, which isn't one thought
+— it's a list of three towns in three `**Town**` paragraphs, one after
+another. A list has no natural length limit, so the strategy that protects a
+single thought produces an oversized chunk when handed one.
+
+Working backwards the way the brief suggests: the chunk exists, is
+well-formed, and starts with its header, so loading is fine. The problem is
+visible in the chunker's own output before anything is embedded, so it's not
+retrieval and not generation. Chunking.
+
+There is a second half to this that isn't the pipeline's fault. I set the
+750 ceiling in week 1 by measuring 84 `##` sections at 177–712 characters and
+adding ~40 for the header. The chunker actually produces 94 chunks reaching
+784. I sampled the sections, not the chunks, and the sample missed the
+largest one — so the bound was slightly too tight the day I wrote it. The
+criterion was still correct and still measurable; I just couldn't have known
+from my own notes that one section would break it.
+
+### No pattern — one miss
+
+With a single miss there is nothing to generalise from. Two observations
+instead, both of which matter more than the miss did.
+
+**Criterion 1 passed at exactly 4 of 5, with no margin.** A target hit exactly
+is one bad retrieval away from failing, and it would be dishonest to read that
+as comfortable. It is the criterion I would tighten if I were setting these
+again — "the top three results contain the answer" rather than any of the top
+five, which is a stricter claim about ranking and not just presence.
+
+**One of my five numbers was wrong, and not because of any pipeline stage.**
+`scorer.py::retrieval_hits` scored "Does Elder Ness have public transport?" as
+a retrieval miss. The retrieved chunks describe a one-street village crossed
+on foot with a single car park, which is enough to state that there is no
+public transport, and `python app.py ask` produced exactly that answer from
+those same chunks. My `RETRIEVAL_RUBRIC` contradicted itself — it opened by
+allowing a fact that could be inferred and closed by requiring the fact to be
+present — and the judge followed the stricter line.
+
+That failure sits outside the five stages entirely. Loading, chunking,
+embedding, retrieval and generation all did their job; the thing that got it
+wrong was the instrument I built to measure them. It is the most useful thing
+this test found, because a measurement error doesn't announce itself the way a
+bad answer does — it just produces a confident number. I only caught it by
+reading the chunks behind a verdict instead of trusting the verdict.
+
 ## The Improvement
 
 **What I changed:** Chunking. `chunker.py::split_documents` made one chunk per
