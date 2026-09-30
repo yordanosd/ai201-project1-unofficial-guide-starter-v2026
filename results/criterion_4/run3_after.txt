@@ -1,0 +1,26 @@
+# Criterion 4 — chunks carry their document header
+
+- Produced by: `chunker.py::split_documents`
+- Measured by: `check_criterion_4.py::report`
+- Summary line from: `chunker.py::describe`
+- Corpus: `city_guides` (14 documents)
+- Bound from criteria.md section 4: 150-750 characters
+- When: 2026-09-29 20:16:27
+
+Costs no model calls — chunking runs locally.
+
+95 chunks, 339 characters on average (shortest 196, longest 680), produced by chunker.py::split_documents
+
+## The two checks
+
+| Check | Result |
+|---|---|
+| (a) text begins with its source filename | 95/95 |
+| (b) 150 <= length <= 750 | 95/95 |
+
+Size distribution: shortest 196, median 324, longest 680.
+Five largest: [572, 580, 592, 627, 680]
+
+## Verdict
+
+MET — all 95 chunks carry a header and sit inside 150-750 characters.

@@ -48,3 +48,33 @@
 {"when": "2026-09-29T20:01:29", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
 {"when": "2026-09-29T20:01:29", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
 {"when": "2026-09-29T20:01:29", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:10:53", "dimension": "answer", "subject": "How many people in Brightwater river town?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:10:54", "dimension": "answer", "subject": "How many people in Brightwater river town?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:10:56", "dimension": "answer", "subject": "How many people in Brightwater river town?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:10:57", "dimension": "answer", "subject": "Does Elder Ness have public transport?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:10:58", "dimension": "answer", "subject": "Does Elder Ness have public transport?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:10:59", "dimension": "answer", "subject": "Does Elder Ness have public transport?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:10:59", "dimension": "answer", "subject": "Can I visit the mill in Givens Mill in December?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:11:54", "dimension": "answer", "subject": "Can I visit the mill in Givens Mill in December?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:11:55", "dimension": "answer", "subject": "Can I visit the mill in Givens Mill in December?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:11:56", "dimension": "answer", "subject": "How much does the city museum in Marchwood for entry?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:11:57", "dimension": "answer", "subject": "How much does the city museum in Marchwood for entry?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:11:58", "dimension": "answer", "subject": "How much does the city museum in Marchwood for entry?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:11:59", "dimension": "answer", "subject": "Is Brightwater busy in October?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:11:59", "dimension": "answer", "subject": "Is Brightwater busy in October?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:12:54", "dimension": "answer", "subject": "Is Brightwater busy in October?", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:23", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:23", "dimension": "retrieval", "subject": "no public transport", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:23", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:23", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:24", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:25", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:25", "dimension": "retrieval", "subject": "no public transport", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:25", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:25", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:25", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:26", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:26", "dimension": "retrieval", "subject": "no public transport", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:26", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:27", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:16:27", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}

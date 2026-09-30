@@ -1,0 +1,27 @@
+# Criterion 1 — retrieved chunks contain the answer
+
+- Retrieval by: `store.py::search`
+- Judged by: `scorer.py::retrieval_hits` (LLM judge, over chunk text)
+- Measured by: `check_criterion_1.py::report`
+- Corpus: `city_guides` (index variant `v2`)   top-k: 5
+- Target from criteria.md section 1: at least 4 of 5
+- When: 2026-09-29 20:16:21
+
+No generation call is made. The criterion is about what retrieval
+pulled back, so the answer text is deliberately not consulted.
+
+## Results
+
+| Question | expects | Best distance | Chunks retrieved | Contains answer |
+|---|---|---|---|---|
+| How many people in Brightwater river town? | `40,000` | 0.259 | guide_brightwater.md, guide_regional_transport.md, guide_walking.md | HIT |
+| Does Elder Ness have public transport? | `no public transport` | 0.373 | guide_elder_ness.md | HIT |
+| Can I visit the mill in Givens Mill in December? | `closed` | 0.306 | guide_givens_mill.md | HIT |
+| How much does the city museum in Marchwood for entry? | `free` | 0.349 | guide_accessibility.md, guide_marchwood.md | HIT |
+| Is Brightwater busy in October? | `busiest` | 0.314 | guide_brightwater.md, guide_regional_transport.md, guide_seasons.md | HIT |
+
+**5 of 5**
+
+## Verdict
+
+MET — 5 of 5, target was at least 4.

@@ -32,7 +32,7 @@ import scorer
 from store import search
 
 
-def report(out: io.StringIO) -> int:
+def report(out: io.StringIO, variant: str = "default") -> int:
     """Write the measurement into `out`. Returns how many questions hit."""
 
     def say(line: str = "") -> None:
@@ -46,7 +46,7 @@ def report(out: io.StringIO) -> int:
     say("- Retrieval by: `store.py::search`")
     say("- Judged by: `scorer.py::retrieval_hits` (LLM judge, over chunk text)")
     say("- Measured by: `check_criterion_1.py::report`")
-    say(f"- Corpus: `{config.CORPUS}`   top-k: {config.TOP_K}")
+    say(f"- Corpus: `{config.CORPUS}` (index variant `{variant}`)   top-k: {config.TOP_K}")
     say(f"- Target from criteria.md section 1: at least {target} of {len(items)}")
     say(f"- When: {dt.datetime.now():%Y-%m-%d %H:%M:%S}")
     say()
@@ -58,7 +58,7 @@ def report(out: io.StringIO) -> int:
     hits = 0
     for item in items:
         question, expects = item["question"], item.get("expects", "")
-        results = search(question, top_k=config.TOP_K)
+        results = search(question, top_k=config.TOP_K, variant=variant)
         verdict = scorer.retrieval_hits(expects, results)
         hits += verdict
         rows.append((question, expects, results, verdict))
@@ -115,6 +115,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Measure criterion 1 and save the output.")
     parser.add_argument("--run", type=int, required=True,
                         help="which run column this is (1, 2, 3)")
+    parser.add_argument("--variant", default="default",
+                        help="which index variant to search (e.g. v2)")
     parser.add_argument("--label", default="",
                         help="name this measurement, e.g. before/after. Writes "
                              "run1_after.txt instead of run1.txt, so an earlier "
@@ -122,7 +124,7 @@ def main() -> None:
     args = parser.parse_args()
 
     out = io.StringIO()
-    report(out)
+    report(out, variant=args.variant)
     text = out.getvalue()
 
     directory = config.RESULTS_DIR / "criterion_1"
