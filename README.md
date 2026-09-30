@@ -261,17 +261,120 @@ instead of a guess. I wrote every criterion and reason myself.
 
      Milestone 1. -->
 
+
+Source run: `results/run_2026-09-28_1503_before.md` — `python run_eval.py --label before`,
+corpus `city_guides`, top-k 5, relevance cutoff 0.6, caching off.
+
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunks contain the answer | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. The relevance gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. Chunks carry their document header | 94 of 94 | 93/94 | 93/94 | 93/94 | MISSED |
+| 5. A user's time reference maps to the document's season or date range | 2 of 2 | 2/2 | 2/2 | 2/2 | MET |
 
-<!-- Underneath, paste the REAL output for each criterion from one of your
-     runs — the actual text your system produced, not a description of it.
-     Name the file and function that produced it. -->
+Criteria 1, 3 and 4 come out identical in all three columns because each is
+measured on a deterministic stage — `store.py::search` returns the same chunks
+for the same question, the gate is a comparison against a fixed number, and
+`chunker.py::split_documents` produces the same 94 chunks every time. Criteria
+2 and 5 depend on generated text and could have moved between runs. They
+didn't: all three answers to each question named a source and gave a time
+period.
+
+### Real output
+
+**Criterion 1 — retrieved chunks contain the answer.** Judged over chunk text
+by `scorer.py::retrieval_hits`, on chunks from `store.py::search`. 4 of 5 hit;
+the miss was "Does Elder Ness have public transport?" (`expects: "no public
+transport"`). All five retrieved chunks came from the right document, and the
+closest one is this — the corpus never states the fact, it only implies it:
+
+```
+guide_elder_ness.md — Elder Ness ## Getting around
+On foot. The village is one street. The lighthouse is a 25-minute walk along
+the shingle, which is harder going than the distance suggests. There is one
+car park at the village and parking anywhere else on the headland is
+discouraged.
+```
+
+**Criterion 2 — every answer names a source.** Produced by
+`generate.py::answer_from_chunks`, run 1:
+
+```
+Brightwater has a population of about 40,000 people, which roughly doubles
+during term time (from guide_brightwater.md).
+```
+
+**Criterion 3 — the gate stops out-of-corpus questions.** Produced by
+`run_eval.py::check_out_of_scope`, cutoff 0.6, refused 5 of 5. No model call
+was made for any of these — a refused question never reaches the model:
+
+```
+| Out-of-scope question                                       | Best distance | Gate    |
+| What is the capital of Mongolia?                            | 0.819         | refused |
+| How do I change the oil in a diesel engine?                 | 0.937         | refused |
+| Who won the 1994 World Cup?                                 | 1.002         | refused |
+| What is the recommended dosage of ibuprofen for a headache? | 0.798         | refused |
+| How do I write a for loop in Rust?                          | 0.850         | refused |
+```
+
+**Criterion 4 — chunks carry their document header.** Two halves, measured
+separately. The size half comes from `chunker.py::describe`:
+
+```
+$ python chunker.py
+94 chunks, 341 characters on average (shortest 196, longest 784), produced by chunker.py::split_documents
+```
+
+`longest 784` against a 750-character ceiling is the miss — one chunk, 34
+characters over. Second-largest is 680, so it's a single outlier rather than a
+general drift. The header half checks that each chunk's text begins with its
+own source filename:
+
+```
+$ python -c "import chunker, ingest, config; \
+  cs = chunker.split_documents(ingest.load_documents(config.CORPUS)); \
+  print(sum(c.text.lstrip().startswith(c.source) for c in cs), '/', len(cs))"
+94 / 94
+```
+
+The offending chunk, from `python app.py chunks --from-doc guide_accessibility`:
+
+```
+======================================================================
+Chunk 2  |  source: guide_accessibility.md#1  |  produced by: chunker.py::split_documents
+======================================================================
+guide_accessibility.md — Getting around the region with limited mobility
+## Straightforward
+
+**Thornby Wells** is the easiest town in the region. It is flat, compact, and
+everything is within three minutes of everything else. Parking is free for two
+hours anywhere in town and the station is central. The pump room and gardens
+are level throughout.
+
+**Marchwood** has a modern tram network with level boarding on all four lines,
+running every 8 minutes on weekdays. The city museum and covered market are both
+step-free. The distances between districts are the main consideration.
+
+**Brightwater** is level along the river and through the centre. The mill museum
+is step-free. The station is a 15-minute walk from campus on flat ground, or the
+[...]
+```
+
+The header is present, so this chunk passes (a) and fails (b) only.
+
+**Criterion 5 — a time reference maps to the document's season or date range.**
+Produced by `generate.py::answer_from_chunks`. Both questions, run 1:
+
+```
+No, you cannot visit the mill in December because it is closed entirely in
+winter and only runs from March to November (`guide_givens_mill.md`).
+```
+
+```
+Yes, Brightwater is at its busiest from late September through November.
+Source: `guide_brightwater.md` and `guide_seasons.md`
+```
 
 ## Verdicts
 
