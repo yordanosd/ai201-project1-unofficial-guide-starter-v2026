@@ -23,3 +23,28 @@
 {"when": "2026-09-29T19:42:24", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
 {"when": "2026-09-29T19:42:25", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
 {"when": "2026-09-29T19:42:25", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:23", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:23", "dimension": "retrieval", "subject": "no public transport", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:24", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:24", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:25", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:45", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:45", "dimension": "retrieval", "subject": "no public transport", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:45", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:45", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:45", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:46", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:46", "dimension": "retrieval", "subject": "no public transport", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:46", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:46", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:46", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:48", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:48", "dimension": "retrieval", "subject": "no public transport", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:48", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:48", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T19:52:48", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:01:28", "dimension": "retrieval", "subject": "40,000", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:01:29", "dimension": "retrieval", "subject": "no public transport", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:01:29", "dimension": "retrieval", "subject": "closed", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:01:29", "dimension": "retrieval", "subject": "free", "verdict": true, "raw": "YES"}
+{"when": "2026-09-29T20:01:29", "dimension": "retrieval", "subject": "busiest", "verdict": true, "raw": "YES"}

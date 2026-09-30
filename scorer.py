@@ -66,13 +66,27 @@ The answer given: {answer}
 Does the answer meet the standard? One word."""
 
 
-RETRIEVAL_RUBRIC = """The standard: at least one excerpt below contains the \
-expected fact, or contains the information needed to state it.
+RETRIEVAL_RUBRIC = """The standard: at least one excerpt below is enough for a \
+careful reader to state the expected fact.
 
-These excerpts are raw source material, not answers. They may be fragmentary, \
-may discuss other topics, and may bury the fact mid-paragraph. None of that \
-matters. The only question is whether the fact is present in at least one of \
-them.
+The excerpts are raw source material, not answers. They may be fragmentary, \
+discuss other topics, or bury what matters mid-paragraph. None of that counts \
+against them.
+
+When the expected fact is an absence — something not available, not open, not \
+provided — an excerpt meets the standard if it describes the situation fully \
+enough to show the thing is missing. A guide that says a village is one street \
+you cross on foot shows there is no tram, without using the word "tram".
+
+Two examples:
+
+  expected fact: "40,000"
+  excerpt: "Brightwater is a river town of some 40,000 people."
+  YES — the fact is stated.
+
+  expected fact: "step-free entrance"
+  excerpt: "The museum has a cafe on the first floor and opens at ten."
+  NO — nothing here bears on the entrance either way.
 
 The expected fact: {expects}
 
