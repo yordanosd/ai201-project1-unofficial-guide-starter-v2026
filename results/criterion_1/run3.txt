@@ -1,0 +1,84 @@
+# Criterion 1 — retrieved chunks contain the answer
+
+- Retrieval by: `store.py::search`
+- Judged by: `scorer.py::retrieval_hits` (LLM judge, over chunk text)
+- Measured by: `check_criterion_1.py::report`
+- Corpus: `city_guides`   top-k: 5
+- Target from criteria.md section 1: at least 4 of 5
+- When: 2026-09-29 19:42:04
+
+No generation call is made. The criterion is about what retrieval
+pulled back, so the answer text is deliberately not consulted.
+
+## Results
+
+| Question | expects | Best distance | Chunks retrieved | Contains answer |
+|---|---|---|---|---|
+| How many people in Brightwater river town? | `40,000` | 0.259 | guide_brightwater.md, guide_regional_transport.md, guide_walking.md | HIT |
+| Does Elder Ness have public transport? | `no public transport` | 0.373 | guide_elder_ness.md | MISS |
+| Can I visit the mill in Givens Mill in December? | `closed` | 0.306 | guide_givens_mill.md | HIT |
+| How much does the city museum in Marchwood for entry? | `free` | 0.349 | guide_accessibility.md, guide_marchwood.md | HIT |
+| Is Brightwater busy in October? | `busiest` | 0.314 | guide_brightwater.md, guide_regional_transport.md, guide_seasons.md | HIT |
+
+**4 of 5**
+
+## Misses, with every chunk retrieved
+
+Printed in full so the verdict can be checked by hand rather than
+taken on trust — the judge is a model and can be wrong.
+
+### Does Elder Ness have public transport?
+
+expects: `no public transport`
+
+- **guide_elder_ness.md#0** (distance 0.373, 238 chars)
+
+  ```
+  guide_elder_ness.md — Elder Ness
+  Elder Ness is a headland with a village of 300 on it, a lighthouse, a bird observatory, and very little else. People come for one of three reasons — birds, walking, or a deliberate absence of things to do.
+  ```
+
+- **guide_elder_ness.md#4** (distance 0.374, 382 chars)
+
+  ```
+  guide_elder_ness.md — Elder Ness
+  ## What to see
+  
+  The bird observatory takes day visitors and the wardens are generous with their time; spring and autumn migration are the reasons to come. The lighthouse is not open to the public but the walk to it is the point. The shingle beach is dramatic and swimming is genuinely dangerous — there is a strong offshore current and no lifeguard.
+  ```
+
+- **guide_elder_ness.md#2** (distance 0.383, 298 chars)
+
+  ```
+  guide_elder_ness.md — Elder Ness
+  ## Getting around
+  
+  On foot. The village is one street. The lighthouse is a 25-minute walk along the shingle, which is harder going than the distance suggests. There is one car park at the village and parking anywhere else on the headland is prohibited and enforced.
+  ```
+
+- **guide_elder_ness.md#5** (distance 0.390, 236 chars)
+
+  ```
+  guide_elder_ness.md — Elder Ness
+  ## Where to stay
+  
+  The pub has four rooms and the observatory has dormitory accommodation for members and their guests. Both book up entirely for the migration seasons a year ahead. There is nothing else.
+  ```
+
+- **guide_elder_ness.md#7** (distance 0.450, 330 chars)
+
+  ```
+  guide_elder_ness.md — Elder Ness
+  ## Practical notes
+  
+  Cash is still useful at the market and in smaller places, though cards are
+  accepted almost everywhere now. Mobile coverage is good in the centre and
+  patchy on the outskirts. The nearest full hospital is in Brightwater; there is
+  a minor injuries unit locally with limited hours.
+  ```
+
+## Verdict
+
+MET — 4 of 5, target was at least 4.
+
+Exactly at target with no margin. One more miss fails it.
