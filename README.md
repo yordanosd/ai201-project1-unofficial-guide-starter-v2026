@@ -35,7 +35,7 @@ that cites the guide it came from. If they don't, it says so.
 
 ## Chunking Strategy
 
-**Chunk size:** one `##` section per chunk (212–784 characters after prefix; 353 average)
+**Chunk size:** one `##` section per chunk (196–784 characters after prefix; 341 average)
 **Overlap:** 0
 
 **Before (starter):** fixed 800-character windows with 120 overlap, `chunker.py::fallback_split`.
@@ -58,6 +58,19 @@ Corpus: city_guides
   chunked  94 chunks, 341 characters on average (shortest 196, longest 784), produced by chunker.py::split_documents
   stored   94 chunks in 19.4s
 ```
+
+> **Changed in week 2.** That `longest 784` is what broke criterion 4, whose
+> ceiling is 750 — see Diagnoses. `split_documents` now caps section size and
+> splits an oversized section at paragraph breaks, so the strategy is "one
+> chunk per `##` section, *unless the section doesn't fit*". 94 chunks at
+> 196–784 becomes 95 at 196–680:
+>
+> ```text
+>   chunked  95 chunks, 339 characters on average (shortest 196, longest 680), produced by chunker.py::split_documents
+>   stored   95 chunks in 9.4s
+> ```
+>
+> Indexed as variant `v2`, so the week 1 chunking above is still queryable.
 
 Why: the 14 guides have 84 `##` sections measured at 177–712 characters, so a
 section is already one complete thought and never needs splitting. The town
@@ -235,6 +248,51 @@ instead of a guess. I wrote every criterion and reason myself.
      "I used AI to help me code" is not.
 
      Milestone 5. -->
+
+### Week 2
+
+My instructor confirmed AI could write `scorer.py`. Claude wrote considerably
+more than that, and all of it is listed here.
+
+**3. The judge (`scorer.py`), written by Claude.** I first asked whether to
+judge answers with string matching, rapidfuzz, or an LLM. Claude argued
+against fuzzy matching and showed why on my own phrasing: `"no public
+transport"` scores 89.5 against an answer saying the *opposite*, and
+`"40,000"` scores 83.3 against `"4,000"`, so no threshold separates a
+paraphrase from a contradiction. On a four-case demo, substring matching was
+wrong twice and the LLM judge zero times. I asked for an LLM judge on that
+basis, and Claude wrote the whole file — the rubrics, `judge`,
+`retrieval_hits`, `names_source`, `states_time_reference`, and the plumbing.
+
+What I changed: Claude initially proposed leaving the rubrics for me to write
+and I told it to write them. That turned out to matter — `RETRIEVAL_RUBRIC`
+came back self-contradictory, allowing inferred facts in one line and
+requiring literal presence in the next, and it cost me a wrong verdict on
+criterion 1. Claude also described that miss to me as a corpus gap, and I
+pushed back after reading the chunk myself; it was the rubric. I had the
+rubric rewritten with the standard stated once, a clause for absences, and
+worked examples.
+
+**4. The chunking fix (`chunker.py::_fit`), written by Claude.** I asked for
+a size cap so oversized sections split. Two things came back that I wouldn't
+have caught: the `index` field had to become a running counter, because
+`store.py` builds Chroma ids from `source#index` and a split section would
+have produced duplicate ids and silently dropped a chunk; and splitting
+re-prefixes the header onto every piece, which costs ~72 characters per
+split. Before writing it, Claude listed three reasons the fix might backfire,
+including that smaller chunks could push criterion 1 below target — that
+didn't happen, but it was the right thing to check.
+
+**5. The measurement scripts, written by Claude — and one thing it broke.**
+`check_criterion_1.py` and `check_criterion_4.py` exist because I asked where
+the numbers in my run log came from and the answer, for two of them, was an
+ad-hoc script that saved nothing. Claude then re-ran one of those scripts and
+**silently overwrote `results/criterion_1/run1.txt`**, replacing the 4-of-5
+measurement with 5-of-5. I caught it by asking whether we were editing things
+that show how the project progressed. The originals were restored from git and
+both scripts now take `--label` and refuse to overwrite an unlabelled file.
+Claude also wrote a judge-calibration harness that I never ran and deleted
+rather than submit unused.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
