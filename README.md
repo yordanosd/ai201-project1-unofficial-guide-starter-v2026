@@ -417,25 +417,48 @@ Source: `guide_brightwater.md` and `guide_seasons.md`
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** Chunking. `chunker.py::split_documents` made one chunk per
+`##` section with no size cap, so a long section became a long chunk. It now
+checks each section against the 150–750 bound and, when one is over, splits it
+at paragraph breaks and re-prefixes the header onto every piece
+(`chunker.py::_fit`). Sentence-level and hard cuts sit behind that as
+fallbacks, so the bound holds whatever the corpus contains.
 
-**Why I picked it:**
+**Why I picked it:** Criterion 4 was my only miss, and the diagnosis named
+chunking — `guide_accessibility.md#1` was 784 characters because its
+"Straightforward" section describes three towns in three paragraphs, and my
+chunker had no rule that could cut it.
 
-<!-- Connect it to a specific diagnosis above in one sentence. If you can't,
-     you picked a fix because it sounded impressive. -->
+Indexed as variant `v2` rather than rebuilt in place, so the old chunking is
+still queryable for comparison: `python app.py --variant v2 index`.
 
 ### Run Log — After
 
-<!-- Same format, same five criteria, three runs each.
-     `python run_eval.py --label after` -->
+`python run_eval.py --label after --variant v2` →
+`results/run_2026-09-29_2012_after.md`, plus
+`results/criterion_1/run{1,2,3}_after.txt` and
+`results/criterion_4/run{1,2,3}_after.txt`.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunks contain the answer | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. The relevance gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. Chunks carry their document header | 95 of 95 | 95/95 | 95/95 | 95/95 | MET |
+| 5. A user's time reference maps to the document's season or date range | 2 of 2 | 2/2 | 2/2 | 2/2 | MET |
+
+Criterion 4's denominator moves from 94 to 95 because the fix splits one chunk
+into two. The target itself is unchanged — it was always "every chunk", and
+"every chunk" is now 95 of them.
+
+| | Before | After |
+|---|---|---|
+| 1. Retrieved chunks contain the answer | 4/5 MET | 5/5 MET |
+| 2. Every answer names a source | 5/5 MET | 5/5 MET |
+| 3. Gate stops out-of-corpus questions | 5/5 MET | 5/5 MET |
+| 4. Chunks carry their document header | 93/94 **MISSED** | 95/95 **MET** |
+| 5. Time reference → season or date range | 2/2 MET | 2/2 MET |
+| chunk size range | 196–784 | 196–680 |
 
 **Did it help?**
 
@@ -445,6 +468,29 @@ Source: `guide_brightwater.md` and `guide_seasons.md`
      tell.
 
      Milestone 4. -->
+
+Yes, for the criterion it was aimed at. Criterion 4 went from MISSED to MET:
+the longest chunk dropped from 784 characters to 680, all 95 chunks now sit
+inside the 150–750 bound, and all 95 still carry their header.
+
+Nothing regressed. Criteria 2, 3 and 5 are unchanged, and for four of the five
+questions the best retrieval distance is identical before and after (0.373,
+0.306, 0.349, 0.314) — only one chunk in the whole corpus was split, so most
+questions never touched the change.
+
+**Criterion 1's 4 of 5 → 5 of 5 is not from this change, and I want to be
+clear about that.** Two things changed in this window: the chunking fix above,
+and a separate fix to `RETRIEVAL_RUBRIC` in `scorer.py`, which had been
+self-contradictory. I measured the rubric fix on its own against the *old*
+index first, and it gave 5 of 5 by itself. So criterion 1 is the judge getting
+a question right that it had been getting wrong, not retrieval improving. The
+chunking change held it at 5 of 5 rather than causing it.
+
+The honest cost of that: the milestone asks for one change, and there were two
+in this window. The only reason I can attribute them separately is that they
+were measured separately. Had I made both and run the test once, criterion 1's
+gain would have been unattributable and I would have had no way to tell which
+change earned it.
 
 ## What's Still Broken
 
